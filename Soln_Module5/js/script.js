@@ -52,6 +52,9 @@ $(function () {
     }
   };
 
+  // Global variable to store the chosen category
+  var chosenCategory;
+
   // On page load (before images or CSS)
   document.addEventListener("DOMContentLoaded", function (event) {
     showLoading("#main-content");
@@ -68,7 +71,7 @@ $(function () {
     $ajaxUtils.sendGetRequest(
       homeHtmlUrl,
       function (homeHtml) {
-        var chosenCategory = chooseRandomCategory(categories);
+        chosenCategory = chooseRandomCategory(categories);
         var chosenCategoryShortName = chosenCategory.short_name;
 
         var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml, 'randomCategoryShortName', chosenCategoryShortName);
@@ -78,7 +81,8 @@ $(function () {
         // Adding click event for the Specials tile
         document.getElementById('specialsTile').addEventListener('click', function () {
           showLoading("#main-content");
-          loadSingleCategory(chosenCategoryShortName);
+          chosenCategory = chooseRandomCategory(categories); // Choose a new category
+          loadSingleCategory(chosenCategory.short_name);
         });
 
         // Adding click event for the restaurant logo to go back to the home page
