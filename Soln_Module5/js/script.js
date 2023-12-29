@@ -14,7 +14,7 @@ $(function () {
   var allCategoriesUrl = "https://coursera-jhu-default-rtdb.firebaseio.com/categories.json";
   var categoriesTitleHtml = "snippets/categories-title-snippet.html";
   var categoryHtml = "snippets/category-snippet.html";
-  var menuItemsUrl = "https://coursera-jhu-default-rtdb.firebaseio.com/menu_items.json"; // Updated URL
+  var menuItemsUrl = "https://coursera-jhu-default-rtdb.firebaseio.com/menu_items.json";
   var menuItemsTitleHtml = "snippets/menu-items-title.html";
   var menuItemHtml = "snippets/menu-item.html";
 
@@ -52,8 +52,10 @@ $(function () {
     }
   };
 
-  // Global variable to store the chosen category
+  // Global variable to store the chosen category and image
   var chosenCategory;
+  var chosenMenuImage;
+  var chosenSpecialsImage;
 
   // On page load (before images or CSS)
   document.addEventListener("DOMContentLoaded", function (event) {
@@ -72,9 +74,12 @@ $(function () {
       homeHtmlUrl,
       function (homeHtml) {
         chosenCategory = chooseRandomCategory(categories);
-        var chosenCategoryShortName = chosenCategory.short_name;
+        chosenMenuImage = getRandomImage(); // Get a random image for menu
+        chosenSpecialsImage = getRandomImage(); // Get a random image for specials
 
-        var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml, 'randomCategoryShortName', chosenCategoryShortName);
+        var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml, 'randomCategoryShortName', chosenCategory.short_name);
+        homeHtmlToInsertIntoMainPage = insertProperty(homeHtmlToInsertIntoMainPage, 'menuImage', chosenMenuImage);
+        homeHtmlToInsertIntoMainPage = insertProperty(homeHtmlToInsertIntoMainPage, 'specialsImage', chosenSpecialsImage);
 
         insertHtml("#main-content", homeHtmlToInsertIntoMainPage);
 
@@ -82,6 +87,8 @@ $(function () {
         document.getElementById('specialsTile').addEventListener('click', function () {
           showLoading("#main-content");
           chosenCategory = chooseRandomCategory(categories); // Choose a new category
+          chosenMenuImage = getRandomImage(); // Get a new random image for menu
+          chosenSpecialsImage = getRandomImage(); // Get a new random image for specials
           loadSingleCategory(chosenCategory.short_name);
         });
 
@@ -95,37 +102,12 @@ $(function () {
     );
   }
 
-  // Load a single category page based on the category short name
-  function loadSingleCategory(categoryShortName) {
-    $ajaxUtils.sendGetRequest(
-      menuItemsUrl + categoryShortName + ".json",
-      function (categoryData) {
-        $ajaxUtils.sendGetRequest(
-          menuItemsTitleHtml,
-          function (menuItemsTitleHtml) {
-            $ajaxUtils.sendGetRequest(
-              menuItemHtml,
-              function (menuItemHtml) {
-                switchMenuToActive();
-
-                var menuItemsViewHtml =
-                  buildMenuItemsViewHtml(categoryData, menuItemsTitleHtml, menuItemHtml);
-                insertHtml("#main-content", menuItemsViewHtml);
-              },
-              false
-            );
-          },
-          false
-        );
-      },
-      true
-    );
-  }
-
-  // Given array of category objects, returns a random category object.
-  function chooseRandomCategory(categories) {
-    var randomArrayIndex = Math.floor(Math.random() * categories.length);
-    return categories[randomArrayIndex];
+  // Function to get a random image from the 'images' folder
+  function getRandomImage() {
+    var imageFolder = 'images/';
+    var imageFiles = ['image1.jpg', 'image2.jpg', 'image3.jpg', /* add more image filenames */];
+    var randomImageIndex = Math.floor(Math.random() * imageFiles.length);
+    return imageFolder + imageFiles[randomImageIndex];
   }
 
   // ... (existing code)
