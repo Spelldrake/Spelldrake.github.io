@@ -74,8 +74,47 @@ $(function () {
         var homeHtmlToInsertIntoMainPage = insertProperty(homeHtml, 'randomCategoryShortName', chosenCategoryShortName);
 
         insertHtml("#main-content", homeHtmlToInsertIntoMainPage);
+
+        // Adding click event for the Specials tile
+        document.getElementById('specialsTile').addEventListener('click', function () {
+          showLoading("#main-content");
+          loadSingleCategory(chosenCategoryShortName);
+        });
+
+        // Adding click event for the restaurant logo to go back to the home page
+        document.getElementById('logo').addEventListener('click', function () {
+          showLoading("#main-content");
+          insertHtml("#main-content", homeHtmlToInsertIntoMainPage);
+        });
       },
       false
+    );
+  }
+
+  // Load a single category page based on the category short name
+  function loadSingleCategory(categoryShortName) {
+    $ajaxUtils.sendGetRequest(
+      menuItemsUrl + categoryShortName + ".json",
+      function (categoryData) {
+        $ajaxUtils.sendGetRequest(
+          menuItemsTitleHtml,
+          function (menuItemsTitleHtml) {
+            $ajaxUtils.sendGetRequest(
+              menuItemHtml,
+              function (menuItemHtml) {
+                switchMenuToActive();
+
+                var menuItemsViewHtml =
+                  buildMenuItemsViewHtml(categoryData, menuItemsTitleHtml, menuItemHtml);
+                insertHtml("#main-content", menuItemsViewHtml);
+              },
+              false
+            );
+          },
+          false
+        );
+      },
+      true
     );
   }
 
@@ -85,5 +124,5 @@ $(function () {
     return categories[randomArrayIndex];
   }
 
-  global.$dc = dc;
+  // ... (existing code)
 })(window);
